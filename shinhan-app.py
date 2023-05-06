@@ -120,30 +120,36 @@ if st.button("Send"):
             yf_df.ret.plot(secondary_y=True, ax=ax)
             ax.legend()
 
+            st.text('최근 1년 추이')
             st.pyplot(fig)
+
+            test_df = yf_df.reset_index()[['Date', 'Close']]
+            test_df.columns = ['ds', 'y']
+            prophet = Prophet(seasonality_mode = 'multiplicative',
+                    yearly_seasonality=True, 
+                    weekly_seasonality=True,
+                    daily_seasonality=True,
+                    changepoint_prior_scale=0.5)
+
+            prophet.fit(test_df)
+
+            future_data = prophet.make_future_dataframe(periods = 5, freq = 'd')
+            forecast_data = prophet.predict(future_data)
+
+            st.text('5일 이후 예측')
+            st.dataframe(forecast_data[['ds','yhat', 'yhat_lower', 'yhat_upper']].tail(5))
+            fig1 = prophet.plot(forecast_data)
+
+            st.text('예측 보조 그래프')
+            st.pyplot(fig1)
+
 
 
         except:
             text2.text_area("관련 기업 추출", value="기업 정보 없음.")
         
 
-        test_df = yf_df.reset_index()[['Date', 'Close']]
-        test_df.columns = ['ds', 'y']
-        prophet = Prophet(seasonality_mode = 'multiplicative',
-                yearly_seasonality=True, 
-                weekly_seasonality=True,
-                daily_seasonality=True,
-                changepoint_prior_scale=0.5)
 
-        prophet.fit(test_df)
-
-        future_data = prophet.make_future_dataframe(periods = 5, freq = 'd')
-        forecast_data = prophet.predict(future_data)
-
-
-        st.dataframe(forecast_data[['ds','yhat', 'yhat_lower', 'yhat_upper']].tail(5))
-        fig1 = prophet.plot(forecast_data)
-        st.pyplot(fig1)
 
 
 
