@@ -106,6 +106,7 @@ if st.button("Send"):
 
     st.session_state["messages1"] = BASE_PROMPT_CP
     st.session_state["messages2"] = BASE_PROMPT_TC
+    st.session_state["messages3"] = BASE_PROMPT_SM
 
     with st.spinner("Generating response..."):
         st.session_state["messages1"] += [{"role": "user", "content": prompt}]
@@ -188,6 +189,8 @@ if st.button("Send"):
         ]
         st.session_state['output'] += message_response
         text1.text_area("기술용어 설명", value=st.session_state['output'], height=400)
+
+
 
 
         st.session_state["messages3"] += [{"role": "user", "content": prompt}]
