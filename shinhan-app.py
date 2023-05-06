@@ -76,9 +76,6 @@ text1.text_area("기술용어 설명")
 text2 = st.empty()
 text2.text_area("관련 기업 추출")
 
-text3 = st.empty()
-text3.text_area("5일 이후 예측")
-
 
 #text2 = st.text_area('예시2', value=st.session_state['output'])
 
@@ -143,6 +140,7 @@ if st.button("Send"):
         future_data = prophet.make_future_dataframe(periods = 5, freq = 'd')
         forecast_data = prophet.predict(future_data)
 
+
         st.dataframe(forecast_data[['ds','yhat', 'yhat_lower', 'yhat_upper']].tail(5))
         fig1 = prophet.plot(forecast_data)
         st.pyplot(fig1)
@@ -168,4 +166,3 @@ if st.button("Clear"):
     st.session_state["messages1"] = ""
     st.session_state["messages2"] = ""
     st.session_state["output"] = ""
-    st.session_state["forcast"] = ""
