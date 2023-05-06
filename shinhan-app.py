@@ -71,7 +71,7 @@ prompt = st.text_input("해외 뉴스 기사 입력", placeholder="해외 뉴스
 
 
 text1 = st.empty()
-text1.text_area("기술용어 설명")
+text1.text_area("기술용어 설명", height=400)
 
 text2 = st.empty()
 text2.text_area("관련 기업 추출")
@@ -164,7 +164,7 @@ if st.button("Send"):
             {"role": "system", "content": message_response}
         ]
         st.session_state['output'] += message_response
-        text1.text_area("기술용어 설명", value=st.session_state['output'])
+        text1.text_area("기술용어 설명", value=st.session_state['output'], height=400)
 
 
 
