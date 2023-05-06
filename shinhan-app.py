@@ -197,15 +197,15 @@ if st.button("Send"):
         )
 
         message_response_SM = response_SM["choices"][0]["message"]["content"]
-        st.session_state["messages2"] += [
+        st.session_state["messagese3"] += [
             {"role": "system", "content": message_response_SM}
         ]
-        st.session_state['output'] += message_response_SM
-        text3.text_area("기술용어 설명", value=st.session_state['output'], height=400)
+        text3.text_area("기술용어 설명", value=message_response_SM, height=400)
 
 
 
 if st.button("Clear"):
     st.session_state["messages1"] = ""
     st.session_state["messages2"] = ""
+    st.session_state["messages3"] = ""
     st.session_state["output"] = ""
