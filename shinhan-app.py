@@ -200,7 +200,7 @@ if st.button("Send"):
         )
 
         message_response_SM = response_SM["choices"][0]["message"]["content"]
-        text3.text_area("기술용어 설명", value=message_response_SM)
+        text3.text_area("뉴스기사 요약", value=message_response_SM)
 
 
 
