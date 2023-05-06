@@ -5,6 +5,11 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
 
+
+st.header("신한은행, 해외주식 알림이 챗봇")
+
+
+
 # api 입력하는 창 만들기
 API_KEY = st.sidebar.text_input(":blue[Enter Your OPENAI API-KEY :]", 
                 placeholder="본인의 api 키를 입력해 주세요! (sk-...)",
