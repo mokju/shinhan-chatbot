@@ -26,6 +26,9 @@ if "messages1" not in st.session_state:
 if "messages2" not in st.session_state:
     st.session_state["messages2"] = ""
 
+if "messages3" not in st.session_state:
+    st.session_state["messages3"] = ""
+
 if "output" not in st.session_state:
     st.session_state["output"] = ""
 
@@ -66,6 +69,22 @@ In addition, the report says Apple’s Health app will be getting tools for trac
 ]
 
 
+
+BASE_PROMPT_SM = [
+        {"role": "system", "content": "This system summarizes news articles and shows them in Korean."},
+        {"role": "user", "content": """
+Apple and Nike is developing an AI-powered health coaching service code named Quartz, according to a new report from Bloomberg’s Mark Gurman. The tech giant is reportedly also working on technology for tracking emotions and plans to roll out an iPad version of the iPhone Health app this year.
+The AI-powered health coaching service is designed to help users stay motivated to exercise, improve their eating habits and sleep better. The idea behind the service is to use AI and information from a user’s Apple Watch to develop coaching programs specially tailored for them. As with Apple’s other services, the health coaching service is expected to have a monthly fee.
+Several teams at Apple are reportedly working on the project, including the company’s health, Siri and AI teams. Gurman writes that the service is planned for next year but notes that it could be postponed or shelved altogether.
+In addition, the report says Apple’s Health app will be getting tools for tracking emotions and managing vision conditions, such as nearsightedness. The launch version of the emotion tracker will allow users to log their mood, answer questions about their day and compare their results over time. In the future, Apple reportedly hopes the mood tracker will be able to use algorithms to understand a user’s mood based on their speech, text and other data.
+        """},
+        {"role": "assistant", "content": """
+애플과 나이키가 AI 기반 건강 코칭 서비스 '쿼츠(Quartz)'를 개발 중이라고 블룸버그의 마크 구르만이 보도했습니다. 애플은 감정 추적 기술을 개발하고 있으며 올해 아이폰 헬스 앱의 아이패드 버전을 출시할 계획이라고 합니다. AI 건강 코칭 서비스는 사용자가 운동을 꾸준히 할 수 있도록 도와주고, 식습관을 개선하고, 수면 상태를 개선하도록 설계되었습니다. 애플의 건강, 시리, AI 팀 등이 프로젝트에 참여하고 있으며 내년 출시를 목표로 하지만 연기되거나 전혀 출시되지 않을 수도 있다고 합니다. 애플 헬스 앱은 근시와 같은 시력 문제를 관리하고 감정을 추적하는 도구를 제공할 예정이며, 사용자의 음성, 텍스트 및 기타 데이터를 기반으로 사용자의 기분을 이해하는 알고리즘을 사용할 수 있도록 발전시키려고 합니다.
+        """}
+]
+
+
+
 prompt = st.text_input("해외 뉴스 기사 입력", placeholder="해외 뉴스 기사를 입력해 주세요.")
 
 
@@ -73,8 +92,12 @@ prompt = st.text_input("해외 뉴스 기사 입력", placeholder="해외 뉴스
 text1 = st.empty()
 text1.text_area("기술용어 설명", height=400)
 
+text3 = st.empty()
+text3.text_area("뉴스 기사 요약")
+
 text2 = st.empty()
 text2.text_area("관련 기업 추출")
+
 
 
 #text2 = st.text_area('예시2', value=st.session_state['output'])
@@ -165,6 +188,20 @@ if st.button("Send"):
         ]
         st.session_state['output'] += message_response
         text1.text_area("기술용어 설명", value=st.session_state['output'], height=400)
+
+
+        st.session_state["messages3"] += [{"role": "user", "content": prompt}]
+
+        response_SM = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo", messages=st.session_state["messages3"]
+        )
+
+        message_response_SM = response_SM["choices"][0]["message"]["content"]
+        st.session_state["messages2"] += [
+            {"role": "system", "content": message_response_SM}
+        ]
+        st.session_state['output'] += message_response_SM
+        text3.text_area("기술용어 설명", value=st.session_state['output'], height=400)
 
 
 
