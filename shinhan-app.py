@@ -4,6 +4,7 @@ import yfinance
 import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
+from prophet import Prophet
 
 
 st.header("신한은행, 해외주식 알림이 챗봇")
@@ -75,6 +76,9 @@ text1.text_area("기술용어 설명")
 text2 = st.empty()
 text2.text_area("관련 기업 추출")
 
+text3 = st.empty()
+text3.text_area("5일 이후 예측")
+
 
 #text2 = st.text_area('예시2', value=st.session_state['output'])
 
@@ -122,10 +126,28 @@ if st.button("Send"):
             st.pyplot(fig)
 
 
-
         except:
             text2.text_area("관련 기업 추출", value="기업 정보 없음.")
         
+
+        test_df = yf_df.reset_index()[['Date', 'Close']]
+        test_df.columns = ['ds', 'y']
+        prophet = Prophet(seasonality_mode = 'multiplicative',
+                yearly_seasonality=True, 
+                weekly_seasonality=True,
+                daily_seasonality=True,
+                changepoint_prior_scale=0.5)
+
+        prophet.fit(test_df)
+
+        future_data = prophet.make_future_dataframe(periods = 5, freq = 'd')
+        forecast_data = prophet.predict(future_data)
+
+        st.dataframe(forecast_data[['ds','yhat', 'yhat_lower', 'yhat_upper']].tail(5))
+        fig1 = prophet.plot(forecast_data)
+        st.pyplot(fig1)
+
+
 
         st.session_state["messages2"] += [{"role": "user", "content": prompt}]
 
@@ -146,3 +168,4 @@ if st.button("Clear"):
     st.session_state["messages1"] = ""
     st.session_state["messages2"] = ""
     st.session_state["output"] = ""
+    st.session_state["forcast"] = ""
