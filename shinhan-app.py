@@ -5,7 +5,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
 from prophet import Prophet
-
+from yahooquery import Ticker
 
 st.header("신한은행, 해외주식 알림이 챗봇")
 st.subheader("made by TopGun🛩️")
@@ -29,6 +29,9 @@ if "messages2" not in st.session_state:
 
 if "messages3" not in st.session_state:
     st.session_state["messages3"] = ""
+
+if "messages4" not in st.session_state:
+    st.session_state["messages4"] = ""
 
 if "output" not in st.session_state:
     st.session_state["output"] = ""
@@ -86,6 +89,29 @@ In addition, the report says Apple’s Health app will be getting tools for trac
 
 
 
+BASE_PROMPT_ST = [
+        {"role": "system", "content": "주식 투자에 도움이 될 수 있는 정보만 추출한 다음, 요약해서 쉽게 해석을 진행해주는 시스템."},
+        {"role": "user", "content": """
+{'AAPL': {'maxAge': 86400, 'currentPrice': 172.57, 'targetHighPrice': 190.28, 'targetLowPrice': 107.43, 'targetMeanPrice': 162.85, 'targetMedianPrice': 163.87, 'recommendationMean': 2.0, 'recommendationKey': 'buy', 'numberOfAnalystOpinions': 38, 'totalCash': 55872000000, 'totalCashPerShare': 3.552, 'ebitda': 123788001280, 'totalDebt': 109614997504, 'quickRatio': 0.764, 'currentRatio': 0.94, 'totalRevenue': 385095008256, 'debtToEquity': 176.349, 'revenuePerShare': 24.116, 'returnOnAssets': 0.20559, 'returnOnEquity': 1.4560499, 'grossProfits': 170782000000, 'freeCashflow': 83796623360, 'operatingCashflow': 109583998976, 'earningsGrowth': 0.0, 'revenueGrowth': -0.025, 'grossMargins': 0.43181, 'ebitdaMargins': 0.32145, 'operatingMargins': 0.29163, 'profitMargins': 0.24493, 'financialCurrency': 'USD'}}
+        """},
+        {"role": "assistant", "content": """
+이 정보를 기반으로 한 주식 투자 결정은 다음과 같을 수 있습니다:
+
+Apple의 현재 주가는 $172.57이며, 분석가들은 주식에 긍정적인 전망을 가지고 있습니다. 목표 평균가는 $162.85이며, 이는 현재 주가보다 높습니다.
+Apple는 현금 보유액이 크며, 안정적인 재무 상태를 유지하고 있습니다. 또한, 자산 대비 수익성 지표인 자산 수익률과 자기 자본 수익률이 양호합니다.
+현금 흐름과 총이익은 크고, 영업 및 순이익 마진도 꽤 높습니다.
+매출은 최근 감소했지만, 이익 성장률은 0.0으로 안정적입니다.
+주식 분석가들은 Apple 주식에 대해 매수를 권장하고 있습니다.
+Apple의 총 부채는 $109,614,997,504로 상당히 큽니다. 이는 자기 자본 대비 높은 부채를 나타내는데, 이는 재무 위험 요소일 수 있습니다.
+Apple의 총 매출은 $385,095,008,256으로 매우 높습니다. 하지만 최근 매출 성장률은 -0.025로 감소했습니다.
+Apple의 주당 매출액은 $24.116이며, 이는 기업의 각 주식으로 얻을 수 있는 매출을 의미합니다.
+Apple의 자유 현금 흐름은 $83,796,623,360로 큰 금액입니다. 이는 기업이 영업 활동과 관련하여 생성하는 현금 흐름을 나타냅니다.
+이 정보를 종합해 볼 때, Apple은 안정적인 재무 상태를 유지하고 있으며, 매출과 이익은 크지만 최근에는 감소했습니다. 현재 주가는 분석가들이 매수를 권장하고 있습니다. 그러나 부채가 높고 최근 매출 성장률이 감소한 점을 고려하여 투자 결정을 내리는 것이 중요합니다. 추가적인 조사와 기업 분석을 통해 개인의 투자 목표와 위험 성향을 고려하여 투자 결정을 내리는 것이 좋습니다. 주식 투자는 위험 요소를 포함하므로 신중한 판단이 필요합니다.
+        """}
+]
+
+
+
 prompt = st.text_input("해외 뉴스 기사 입력", placeholder="해외 뉴스 기사를 입력해 주세요.")
 
 
@@ -99,7 +125,8 @@ text3.text_area("뉴스 기사 요약")
 text2 = st.empty()
 text2.text_area("관련 기업 추출")
 
-
+text4 = st.empty()
+text4.text_area("재무재표 해석")
 
 #text2 = st.text_area('예시2', value=st.session_state['output'])
 
@@ -108,6 +135,7 @@ if st.button("Send"):
     st.session_state["messages1"] = BASE_PROMPT_CP
     st.session_state["messages2"] = BASE_PROMPT_TC
     st.session_state["messages3"] = BASE_PROMPT_SM
+    st.session_state["messages4"] = BASE_PROMPT_ST
 
     with st.spinner("Generating response..."):
         st.session_state["messages1"] += [{"role": "user", "content": prompt}]
@@ -132,6 +160,9 @@ if st.button("Send"):
 
             today = datetime.today()
             year_ago = today - timedelta(365)
+
+            t = Ticker(company_code[0], asynchronous=True)
+            financial_info = t.financial_data
 
             yf_data = yfinance.download (tickers = company_code[0].strip(), start = year_ago.strftime('%Y-%m-%d'), end = today.strftime('%Y-%m-%d'), interval = "1d")
             yf_df = pd.DataFrame()      # emptry df and assign with column name 
@@ -203,6 +234,19 @@ if st.button("Send"):
         message_response_SM = response_SM["choices"][0]["message"]["content"]
         text3.text_area("뉴스기사 요약", value=message_response_SM)
 
+
+
+        try:
+            st.session_state["messages4"] += [{"role": "user", "content": str(financial_info)}]
+
+            response_ST = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo", messages=st.session_state["messages4"]
+            )
+
+            message_response_ST = response_ST["choices"][0]["message"]["content"]
+            text4.text_area("재무제표 해석", value=message_response_ST, height=400)
+        except:
+            text4.text_area("재무제표 해석", value='정보 없음')
 
 
 if st.button("Clear"):
