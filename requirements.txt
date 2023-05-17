@@ -4,5 +4,5 @@ yfinance
 pandas
 matplotlib
 datetime
-prophet
+prophet==1.1.1
 yahooquery
