@@ -4,7 +4,7 @@ import yfinance
 import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
-from fbprophet import Prophet
+from prophet import Prophet
 from yahooquery import Ticker
 
 st.header("신한은행, 해외주식 알림이 챗봇")
