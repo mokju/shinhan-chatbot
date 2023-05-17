@@ -4,5 +4,5 @@ yfinance
 pandas
 matplotlib
 datetime
-fbprophet
+prophet
 yahooquery
