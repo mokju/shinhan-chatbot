@@ -5,4 +5,5 @@ pandas
 matplotlib
 datetime
 prophet
+fbprophet
 yahooquery
