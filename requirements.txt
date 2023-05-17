@@ -7,4 +7,4 @@ datetime
 prophet
 yahooquery
 pystan
-holidays
+holidays==0.9.12
