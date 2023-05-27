@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from prophet import Prophet
 from yahooquery import Ticker
 
-st.header("신한은행, 해외주식 알림이 챗봇")
+st.header("신한AI, 해외주식 알림이 챗봇")
 st.subheader("made by TopGun🛩️")
 st.text('반드시 api 키를 입력하고 엔터를 먼저 눌러주세요.')
 
