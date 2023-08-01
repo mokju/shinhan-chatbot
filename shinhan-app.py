@@ -1,3 +1,5 @@
+# 신한 AI 공모전
+
 import openai
 import streamlit as st
 import yfinance
